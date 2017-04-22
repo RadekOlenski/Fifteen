@@ -92,9 +92,46 @@ namespace Fifteen.Base
                 }
         }
 
-        public bool CanMoveToDirection(string direction)
+        public bool CanMoveInDirection(string direction)
         {
             return AvailableDirections.Contains(direction);
+        }
+
+        public void MoveInDirection(string direction)
+        {
+            int newZeroPositionI = zeroPositionI;
+            int newZeroPositionJ = zeroPositionJ;
+
+            switch (direction)
+            {
+                case "U":
+                {
+                    newZeroPositionI -= 1;
+                    break;
+                }
+                case "D":
+                {
+                    newZeroPositionI += 1;
+                    break;
+                }
+                case "L":
+                {
+                    newZeroPositionJ -= 1;
+                    break;
+                }
+                case "R":
+                {
+                    newZeroPositionJ += 1;
+                    break;
+                }
+            }
+
+            int currentNewPositionValue = PuzzleCurrentState[newZeroPositionI, newZeroPositionJ];
+            PuzzleCurrentState[newZeroPositionI, newZeroPositionJ] = 0;
+            PuzzleCurrentState[zeroPositionI, zeroPositionJ] = currentNewPositionValue;
+
+            zeroPositionI = newZeroPositionI;
+            zeroPositionJ = newZeroPositionJ;
         }
 
         #endregion

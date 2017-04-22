@@ -43,7 +43,10 @@ namespace Fifteen
 
             Puzzle entryPuzzle = new Puzzle(height, width, (List<int>) entryFileArgs[2]);
 
-            bool dupa = entryPuzzle.CanMoveToDirection("R");
+            if (entryPuzzle.CanMoveInDirection("U"))
+            {
+                entryPuzzle.MoveInDirection("U");
+            }
         }
 
         #region Methods
