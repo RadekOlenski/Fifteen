@@ -160,7 +160,15 @@ namespace Fifteen.Base
 
             int currentNewPositionValue = PuzzleCurrentState[newZeroPositionI, newZeroPositionJ];
 
-            int[,] newPuzzleState = PuzzleCurrentState;
+            int[,] newPuzzleState = new int[Height, Width];
+
+            for (int i = 0; i < Height; i++)
+            {
+                for (int j = 0; j < Width; j++)
+                {
+                    newPuzzleState[i, j] = PuzzleCurrentState[i, j];
+                }
+            }
 
             newPuzzleState[newZeroPositionI, newZeroPositionJ] = 0;
             newPuzzleState[zeroPositionI, zeroPositionJ] = currentNewPositionValue;

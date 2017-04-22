@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Fifteen.Base;
+using Fifteen.Strategies;
 
 namespace Fifteen
 {
@@ -42,6 +43,9 @@ namespace Fifteen
             int width = Convert.ToInt32(entryFileArgs[1]);
 
             Puzzle entryPuzzle = new Puzzle(height, width, (List<int>) entryFileArgs[2]);
+
+            Bfs bfs = new Bfs(new Node(entryPuzzle), SearchOrder);
+            bfs.ProcessPuzzle();
         }
 
         #region Methods
