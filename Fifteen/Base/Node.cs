@@ -4,24 +4,20 @@
     {
         #region Fields
 
-        public Node Left;
-        public Node Right;
-        public Node Up;
-        public Node Down;
-
         public Puzzle PuzzleState;
+
+        public int Depth;
+        public string PreviousDirections;
 
         #endregion
 
         #region Constructor
 
-        public Node(Puzzle puzzleState, Node left = null, Node right = null, Node up = null, Node down = null)
+        public Node(Puzzle puzzleState, int depth = 0, string previousDirections = "")
         {
             PuzzleState = puzzleState;
-            Left = left;
-            Right = right;
-            Up = up;
-            Down = down;
+            Depth = depth;
+            PreviousDirections = previousDirections;
         }
 
         #endregion

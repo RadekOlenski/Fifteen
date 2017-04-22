@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\Result.cs" />
     <Compile Include="Strategies\Astr.cs" />
     <Compile Include="Strategies\Bfs.cs" />
     <Compile Include="Strategies\Dfs.cs" />

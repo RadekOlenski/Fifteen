@@ -174,7 +174,6 @@ namespace Fifteen.Base
             newPuzzleState[zeroPositionI, zeroPositionJ] = currentNewPositionValue;
 
             return new Puzzle(Height, Width, newPuzzleState, PuzzleDesiredState, newZeroPositionI, newZeroPositionJ);
-
         }
 
         public bool CheckIfInDesiredState()

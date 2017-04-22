@@ -23,7 +23,6 @@ namespace Fifteen
 
         #endregion
 
-
         static void Main(string[] args)
         {
             if (args.Length == 0)
@@ -44,8 +43,8 @@ namespace Fifteen
 
             Puzzle entryPuzzle = new Puzzle(height, width, (List<int>) entryFileArgs[2]);
 
-            Bfs bfs = new Bfs(new Node(entryPuzzle), SearchOrder);
-            bfs.ProcessPuzzle();
+            //Bfs bfs = new Bfs(new Node(entryPuzzle), SearchOrder);
+            //Result result = bfs.ProcessPuzzle();
         }
 
         #region Methods

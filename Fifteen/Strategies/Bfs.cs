@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Fifteen.Base;
 
 namespace Fifteen.Strategies
@@ -12,6 +13,12 @@ namespace Fifteen.Strategies
         private Queue<Node> nodesQueue;
         private List<Node> visitedNodes;
         private string[] searchOrder;
+
+        //Return values
+        private int processedNodes;
+
+        private int depth;
+        private Stopwatch stopwatch;
 
         #endregion
 
@@ -29,16 +36,18 @@ namespace Fifteen.Strategies
 
         #region Methods
 
-        public void ProcessPuzzle()
+        public Result ProcessPuzzle()
         {
+            stopwatch = Stopwatch.StartNew();
+
             //We enqueue our first given node
             nodesQueue.Enqueue(entryNode);
 
             //Check if current Puzzle State is desired puzzle state
             if (entryNode.PuzzleState.CheckIfInDesiredState())
             {
-                //return values
-                return;
+                stopwatch.Stop();
+                return ProcessResult(entryNode);
             }
 
             //We process nodes till no left in queue
@@ -46,31 +55,36 @@ namespace Fifteen.Strategies
             {
                 //We dequeue last node in queue
                 entryNode = nodesQueue.Dequeue();
+                processedNodes++;
 
                 //We iterate node with all directions from given search order
                 foreach (string direction in searchOrder)
                 {
                     //Check if we can move zero in desired direction 
-                    if (entryNode.PuzzleState.CanMoveInDirection(direction))
+                    if (!entryNode.PuzzleState.CanMoveInDirection(direction)) continue;
+
+                    //If we can move we create new node and add it to queue
+                    var tempNode = new Node(entryNode.PuzzleState.MoveInDirection(direction), entryNode.Depth + 1,
+                        entryNode.PreviousDirections + direction);
+
+                    if (tempNode.Depth > depth)
                     {
-                        
-                        //If we can move we create new node and add it to queue
-                        var tempNode = new Node(entryNode.PuzzleState.MoveInDirection(direction));
+                        depth = tempNode.Depth;
+                    }
 
-                        if(visitedNodes.Contains(tempNode)) continue;
+                    if (visitedNodes.Contains(tempNode)) continue;
 
-                        if (tempNode.PuzzleState.CheckIfInDesiredState())
-                        {
-                            //return values
-                            return;
-                        }
+                    if (tempNode.PuzzleState.CheckIfInDesiredState())
+                    {
+                        stopwatch.Stop();
+                        return ProcessResult(tempNode);
+                    }
 
-                        //If new node is not in queue and is not visited we add it to new queue
-                        if (!nodesQueue.Contains(tempNode) && !visitedNodes.Contains(tempNode))
-                        {
-                            nodesQueue.Enqueue(tempNode);
-                            visitedNodes.Add(tempNode);
-                        }
+                    //If new node is not in queue and is not visited we add it to new queue
+                    if (!nodesQueue.Contains(tempNode))
+                    {
+                        nodesQueue.Enqueue(tempNode);
+                        visitedNodes.Add(tempNode);
                     }
                 }
 
@@ -80,6 +94,38 @@ namespace Fifteen.Strategies
                     visitedNodes.Add(entryNode);
                 }
             }
+
+            stopwatch.Stop();
+            return ProcessFailedResult();
+        }
+
+        private Result ProcessResult(Node endNode)
+        {
+            Result result = new Result
+            {
+                SolutionSteps = endNode.Depth,
+                Directions = endNode.PreviousDirections,
+                ProcessedNodes = processedNodes,
+                VisitedNodes = visitedNodes.Count,
+                MaxDepth = depth,
+                Duration = stopwatch.ElapsedMilliseconds
+            };
+
+            return result;
+        }
+
+        private Result ProcessFailedResult()
+        {
+            Result result = new Result
+            {
+                SolutionSteps = -1,
+                ProcessedNodes = processedNodes,
+                VisitedNodes = visitedNodes.Count,
+                MaxDepth = depth,
+                Duration = stopwatch.ElapsedMilliseconds
+            };
+
+            return result;
         }
 
         #endregion
