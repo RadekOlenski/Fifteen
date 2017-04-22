@@ -45,6 +45,9 @@ namespace Fifteen
 
             //Bfs bfs = new Bfs(new Node(entryPuzzle), SearchOrder);
             //Result result = bfs.ProcessPuzzle();
+
+            Dfs dfs = new Dfs(new Node(entryPuzzle), SearchOrder);
+            Result result = dfs.ProcessPuzzle();
         }
 
         #region Methods

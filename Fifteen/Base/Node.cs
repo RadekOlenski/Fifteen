@@ -1,4 +1,6 @@
-﻿namespace Fifteen.Base
+﻿using System.Linq;
+
+namespace Fifteen.Base
 {
     public class Node
     {
@@ -21,5 +23,14 @@
         }
 
         #endregion
+
+        //#region Overrides
+
+        //public override bool Equals(object obj)
+        //{
+        //    Node node = obj as Node;
+        //    return node != null && PuzzleState.PuzzleCurrentState.Cast<int>().SequenceEqual(PuzzleState.PuzzleDesiredState.Cast<int>());
+        //}
+        //#endregion
     }
 }

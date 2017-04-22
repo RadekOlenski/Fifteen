@@ -181,6 +181,11 @@ namespace Fifteen.Base
             return PuzzleCurrentState.Cast<int>().SequenceEqual(PuzzleDesiredState.Cast<int>());
         }
 
+        public bool CheckIfEquals(int[,] puzzleState )
+        {
+            return PuzzleCurrentState.Cast<int>().SequenceEqual(puzzleState.Cast<int>());
+        }
+
         #endregion
     }
 }

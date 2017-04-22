@@ -58,12 +58,13 @@ namespace Fifteen.Strategies
                 processedNodes++;
 
                 //We iterate node with all directions from given search order
-                foreach (string direction in searchOrder)
+                for (var i = 0; i < searchOrder.Length; i++)
                 {
-                    //Check if we can move zero in desired direction 
+                    string direction = searchOrder[i];
+//Check if we can move zero in desired direction 
                     if (!entryNode.PuzzleState.CanMoveInDirection(direction)) continue;
 
-                    //If we can move we create new node and add it to queue
+                    //If we can move we create new node
                     var tempNode = new Node(entryNode.PuzzleState.MoveInDirection(direction), entryNode.Depth + 1,
                         entryNode.PreviousDirections + direction);
 
@@ -72,8 +73,10 @@ namespace Fifteen.Strategies
                         depth = tempNode.Depth;
                     }
 
+                    //Check if node is already visited
                     if (visitedNodes.Contains(tempNode)) continue;
 
+                    //Check if this is a node we are looking for
                     if (tempNode.PuzzleState.CheckIfInDesiredState())
                     {
                         stopwatch.Stop();
