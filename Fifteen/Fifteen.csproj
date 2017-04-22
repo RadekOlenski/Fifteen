@@ -45,15 +45,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Astr.cs" />
-    <Compile Include="Bfs.cs" />
-    <Compile Include="Dfs.cs" />
+    <Compile Include="Strategies\Astr.cs" />
+    <Compile Include="Strategies\Bfs.cs" />
+    <Compile Include="Strategies\Dfs.cs" />
+    <Compile Include="Base\Node.cs" />
+    <Compile Include="Base\Puzzle.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Puzzles\4x4_01_0001.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
