@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Fifteen.Base;
-
-namespace Fifteen
+﻿namespace Fifteen.Base
 {
     public class Node
     {
@@ -32,8 +25,5 @@ namespace Fifteen
         }
 
         #endregion
-
-
-
     }
 }

@@ -38,10 +38,12 @@ namespace Fifteen
 
             List<object> entryFileArgs = ReadEntryFile();
 
-            int width = Convert.ToInt32(entryFileArgs[0]);
-            int height = Convert.ToInt32(entryFileArgs[1]);
+            int height = Convert.ToInt32(entryFileArgs[0]);
+            int width = Convert.ToInt32(entryFileArgs[1]);
 
-            Puzzle entryPuzzle = new Puzzle(width, height, (List<int>) entryFileArgs[2]);
+            Puzzle entryPuzzle = new Puzzle(height, width, (List<int>) entryFileArgs[2]);
+
+            bool dupa = entryPuzzle.CanMoveToDirection("R");
         }
 
         #region Methods
