@@ -29,8 +29,6 @@ namespace Fifteen.Base
 
         public Puzzle(int height, int width, List<int> values)
         {
-            AvailableDirections = new List<string>();
-
             Height = height;
             Width = width;
             Size = Width * Height;
@@ -69,6 +67,22 @@ namespace Fifteen.Base
                 }
             }
 
+            AvailableDirections = new List<string>();
+            CheckAvailableDirections();
+        }
+
+        public Puzzle(int height, int width, int[,] values, int[,] desiredState, int zeroPositionI, int zeroPositionJ)
+        {
+            Height = height;
+            Width = width;
+            Size = Width * Height;
+            PuzzleCurrentState = values;
+            PuzzleDesiredState = desiredState;
+
+            this.zeroPositionI = zeroPositionI;
+            this.zeroPositionJ = zeroPositionJ;
+
+            AvailableDirections = new List<string>();
             CheckAvailableDirections();
         }
 
@@ -115,7 +129,7 @@ namespace Fifteen.Base
             return AvailableDirections.Contains(direction);
         }
 
-        public void MoveInDirection(string direction)
+        public Puzzle MoveInDirection(string direction)
         {
             int newZeroPositionI = zeroPositionI;
             int newZeroPositionJ = zeroPositionJ;
@@ -145,11 +159,14 @@ namespace Fifteen.Base
             }
 
             int currentNewPositionValue = PuzzleCurrentState[newZeroPositionI, newZeroPositionJ];
-            PuzzleCurrentState[newZeroPositionI, newZeroPositionJ] = 0;
-            PuzzleCurrentState[zeroPositionI, zeroPositionJ] = currentNewPositionValue;
 
-            zeroPositionI = newZeroPositionI;
-            zeroPositionJ = newZeroPositionJ;
+            int[,] newPuzzleState = PuzzleCurrentState;
+
+            newPuzzleState[newZeroPositionI, newZeroPositionJ] = 0;
+            newPuzzleState[zeroPositionI, zeroPositionJ] = currentNewPositionValue;
+
+            return new Puzzle(Height, Width, newPuzzleState, PuzzleDesiredState, newZeroPositionI, newZeroPositionJ);
+
         }
 
         public bool CheckIfInDesiredState()
