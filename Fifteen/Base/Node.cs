@@ -24,13 +24,15 @@ namespace Fifteen.Base
 
         #endregion
 
-        //#region Overrides
+        #region Overrides
 
-        //public override bool Equals(object obj)
-        //{
-        //    Node node = obj as Node;
-        //    return node != null && PuzzleState.PuzzleCurrentState.Cast<int>().SequenceEqual(PuzzleState.PuzzleDesiredState.Cast<int>());
-        //}
-        //#endregion
+        public override bool Equals(object obj)
+        {
+            Node node = obj as Node;
+            bool isTheSame = node != null && PuzzleState.PuzzleCurrentState.Cast<int>()
+                                 .SequenceEqual(node.PuzzleState.PuzzleCurrentState.Cast<int>());
+            return isTheSame;
+        }
+        #endregion
     }
 }
