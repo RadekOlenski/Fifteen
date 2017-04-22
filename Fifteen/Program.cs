@@ -52,6 +52,8 @@ namespace Fifteen
             ChosenHeuristic = "manh";
             Astr astr = new Astr(new Node(entryPuzzle),ChosenHeuristic, new []{"R", "L", "U", "D"});
             Result astrResult = astr.ProcessPuzzle();
+            SaveSolution(astrResult);
+            SaveStats(astrResult);
             Console.ReadLine();
         }
 
@@ -115,6 +117,27 @@ namespace Fifteen
             }
 
             return args;
+        }
+
+        private static void SaveSolution(Result result)
+        {
+            using (StreamWriter file = new StreamWriter(@"Solutions/4x4_01_0001_sol.txt"))
+            {
+                file.WriteLine($"{result.SolutionSteps}");
+                file.WriteLine($"{result.Directions}");
+            }
+        }
+
+        private static void SaveStats(Result result)
+        {
+            using (StreamWriter file = new StreamWriter(@"Stats/4x4_01_0001_stats.txt"))
+            {
+                file.WriteLine($"{result.SolutionSteps}");
+                file.WriteLine($"{result.VisitedNodes}");
+                file.WriteLine($"{result.ProcessedNodes}");
+                file.WriteLine($"{result.MaxDepth}");
+                file.WriteLine($"{result.Duration}");
+            }
         }
 
         #endregion

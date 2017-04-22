@@ -78,7 +78,7 @@ namespace Fifteen
                     if (GetManhattanCost(tempNode) == 0)
                     {
                         stopwatch.Stop();
-                        return ProcessResult(entryNode);
+                        return ProcessResult(tempNode);
                     }
 
                     //If new node is not in queue and is not visited we add it to new queue
@@ -140,7 +140,7 @@ namespace Fifteen
                     if (GetHammingCost(tempNode) == 0)
                     {
                         stopwatch.Stop();
-                        return ProcessResult(entryNode);
+                        return ProcessResult(tempNode);
                     }
 
                     //If new node is not in queue and is not visited we add it to new queue
