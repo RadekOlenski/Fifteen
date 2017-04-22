@@ -11,6 +11,7 @@ namespace Fifteen.Base
         #region Fields
 
         public int[,] PuzzleCurrentState;
+        public int[,] PuzzleDesiredState;
 
         public int Width;
         public int Height;
@@ -50,6 +51,24 @@ namespace Fifteen.Base
                 }
             }
 
+            int value = 1;
+            PuzzleDesiredState = new int[Height, Width];
+            for (int i = 0; i < Height; i++)
+            {
+                for (int j = 0; j < Width; j++)
+                {
+                    if (i == Height - 1 && j == Width - 1)
+                    {
+                        PuzzleDesiredState[i, j] = 0;
+                    }
+                    else
+                    {
+                        PuzzleDesiredState[i, j] = value;
+                        value++;
+                    }
+                }
+            }
+
             CheckAvailableDirections();
         }
 
@@ -59,37 +78,36 @@ namespace Fifteen.Base
 
         private void CheckAvailableDirections()
         {
-            if (zeroPositionI != 0 && zeroPositionI != 3)
+            int maxHeight = Height - 1;
+            int maxWidth = Width - 1;
+
+            if (zeroPositionI != 0 && zeroPositionI != maxHeight)
             {
                 AvailableDirections.Add("U");
                 AvailableDirections.Add("D");
             }
-            else
-                switch (zeroPositionI)
-                {
-                    case 0:
-                        AvailableDirections.Add("D");
-                        break;
-                    case 3:
-                        AvailableDirections.Add("U");
-                        break;
-                }
+            else if (zeroPositionI == 0)
+            {
+                AvailableDirections.Add("D");
+            }
+            else if (zeroPositionI == maxHeight)
+            {
+                AvailableDirections.Add("U");
+            }
 
-            if (zeroPositionJ != 0 && zeroPositionJ != 3)
+            if (zeroPositionJ != 0 && zeroPositionJ != maxWidth)
             {
                 AvailableDirections.Add("L");
                 AvailableDirections.Add("R");
             }
-            else
-                switch (zeroPositionJ)
-                {
-                    case 0:
-                        AvailableDirections.Add("R");
-                        break;
-                    case 3:
-                        AvailableDirections.Add("L");
-                        break;
-                }
+            else if (zeroPositionJ == 0)
+            {
+                AvailableDirections.Add("R");
+            }
+            else if (zeroPositionJ == maxWidth)
+            {
+                AvailableDirections.Add("L");
+            }
         }
 
         public bool CanMoveInDirection(string direction)
@@ -132,6 +150,11 @@ namespace Fifteen.Base
 
             zeroPositionI = newZeroPositionI;
             zeroPositionJ = newZeroPositionJ;
+        }
+
+        public bool CheckIfInDesiredState()
+        {
+            return PuzzleCurrentState.Cast<int>().SequenceEqual(PuzzleDesiredState.Cast<int>());
         }
 
         #endregion

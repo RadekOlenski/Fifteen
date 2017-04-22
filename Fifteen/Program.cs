@@ -42,11 +42,6 @@ namespace Fifteen
             int width = Convert.ToInt32(entryFileArgs[1]);
 
             Puzzle entryPuzzle = new Puzzle(height, width, (List<int>) entryFileArgs[2]);
-
-            if (entryPuzzle.CanMoveInDirection("U"))
-            {
-                entryPuzzle.MoveInDirection("U");
-            }
         }
 
         #region Methods
