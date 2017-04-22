@@ -46,8 +46,13 @@ namespace Fifteen
             //Bfs bfs = new Bfs(new Node(entryPuzzle), SearchOrder);
             //Result result = bfs.ProcessPuzzle();
 
-            Dfs dfs = new Dfs(new Node(entryPuzzle), SearchOrder);
-            Result result = dfs.ProcessPuzzle();
+            //Dfs dfs = new Dfs(new Node(entryPuzzle), SearchOrder);
+            //Result result = dfs.ProcessPuzzle();
+
+            ChosenHeuristic = "manh";
+            Astr astr = new Astr(new Node(entryPuzzle),ChosenHeuristic, new []{"R", "L", "U", "D"});
+            Result astrResult = astr.ProcessPuzzle();
+            Console.ReadLine();
         }
 
         #region Methods
