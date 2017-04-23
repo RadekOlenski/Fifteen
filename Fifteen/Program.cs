@@ -18,8 +18,8 @@ namespace Fifteen
         public static string ChosenHeuristic;
 
         public static string PuzzleEntryFileName;
-        public static string SolutionFileName;
-        public static string AdditionalDataFileName;
+        public static string PuzzleOutputFileName;
+        
 
         #endregion
 
@@ -36,24 +36,24 @@ namespace Fifteen
                 ProcessArgsInput();
             }
 
-            List<object> entryFileArgs = ReadEntryFile();
+            string[] filePaths = Directory.GetFiles(@"Puzzles/", "*.txt", SearchOption.TopDirectoryOnly);
 
-            int height = Convert.ToInt32(entryFileArgs[0]);
-            int width = Convert.ToInt32(entryFileArgs[1]);
-
-            Puzzle entryPuzzle = new Puzzle(height, width, (List<int>) entryFileArgs[2]);
-
-            //Bfs bfs = new Bfs(new Node(entryPuzzle), SearchOrder);
-            //Result result = bfs.ProcessPuzzle();
-
-            //Dfs dfs = new Dfs(new Node(entryPuzzle), SearchOrder);
-            //Result result = dfs.ProcessPuzzle();
-
-            ChosenHeuristic = "manh";
-            Astr astr = new Astr(new Node(entryPuzzle),ChosenHeuristic, new []{"R", "L", "U", "D"});
-            Result astrResult = astr.ProcessPuzzle();
-            SaveSolution(astrResult);
-            SaveStats(astrResult);
+            for (var i = 0; i < filePaths.Length; i++)
+            {
+                var filePath = filePaths[i];
+                PuzzleEntryFileName = filePath;
+                Console.WriteLine($"Starting {PuzzleEntryFileName}...");
+                List<object> entryFileArgs = ReadEntryFile();
+                int height = Convert.ToInt32(entryFileArgs[0]);
+                int width = Convert.ToInt32(entryFileArgs[1]);
+                Puzzle entryPuzzle = new Puzzle(height, width, (List<int>) entryFileArgs[2]);
+                Result result = ProcessPuzzle(entryPuzzle);
+                PreparePuzzleOutputFileName();
+                SaveSolution(result);
+                SaveStats(result);
+                Console.WriteLine($"{PuzzleEntryFileName} done!");
+            }
+            Console.WriteLine($"Done!");
             Console.ReadLine();
         }
 
@@ -63,23 +63,16 @@ namespace Fifteen
         {
             Console.WriteLine("Choose strategy [bfs, dfs, astr]: ");
             ChosenStrategy = Console.ReadLine();
-            if (ChosenStrategy == "dfs" || ChosenStrategy == "bfs")
-            {
-                Console.WriteLine("Choose search order [R L U D]: ");
-                string order = Console.ReadLine();
-                if (order != null) SearchOrder = order.Split();
-            }
-            else
+            Console.WriteLine("Choose search order [R L U D]: ");
+            string order = Console.ReadLine();
+            if (order != null) SearchOrder = order.Split();
+            if (ChosenStrategy == "astr")
             {
                 Console.WriteLine("Choose heuristic [hamm, manh]: ");
                 ChosenHeuristic = Console.ReadLine();
             }
-            Console.WriteLine("Choose entry puzzle state file: ");
-            PuzzleEntryFileName = Console.ReadLine();
-            Console.WriteLine("Choose solution file: ");
-            SolutionFileName = Console.ReadLine();
-            Console.WriteLine("Choose additional data file: ");
-            AdditionalDataFileName = Console.ReadLine();
+            //Console.WriteLine("Choose entry puzzle state file: ");
+            //PuzzleEntryFileName = Console.ReadLine();
         }
 
         public static void ProcessArgsInput()
@@ -93,9 +86,7 @@ namespace Fifteen
             try
             {
                 // Open the text file using a stream reader.
-                //Hardocded entry file
-                //using (StreamReader sr = new StreamReader($"Puzzles/{PuzzleEntryFileName}"))
-                using (StreamReader sr = new StreamReader("Puzzles/4x4_01_0001.txt"))
+                using (StreamReader sr = new StreamReader($"{PuzzleEntryFileName}"))
                 {
                     // Read the stream to a string, and write the string to the console.
                     String line = sr.ReadLine();
@@ -105,7 +96,8 @@ namespace Fifteen
                         args.AddRange(sizes);
                     }
                     String puzzleValues = sr.ReadToEnd();
-                    string[] strings = puzzleValues.Split(new[] {"\r\n", "\n", " "}, StringSplitOptions.None);
+                    List<string> strings = puzzleValues.Split(new[] {"\r\n", "\n", " "}, StringSplitOptions.None).ToList();
+                    strings.Remove(strings.Last());
                     List<int> values = strings.Select(int.Parse).ToList();
                     args.Add(values);
                 }
@@ -119,9 +111,22 @@ namespace Fifteen
             return args;
         }
 
+        private static Result ProcessPuzzle(Puzzle entryPuzzle)
+        {
+            switch (ChosenStrategy)
+            {
+                case "bfs":
+                    return new Bfs(new Node(entryPuzzle), SearchOrder).ProcessPuzzle();
+                case "dfs":
+                    return new Dfs(new Node(entryPuzzle), SearchOrder).ProcessPuzzle();
+                default:
+                    return new Astr(new Node(entryPuzzle), ChosenHeuristic, SearchOrder).ProcessPuzzle();
+            }
+        }
+
         private static void SaveSolution(Result result)
         {
-            using (StreamWriter file = new StreamWriter(@"Solutions/4x4_01_0001_sol.txt"))
+            using (StreamWriter file = new StreamWriter($"Solutions/{PuzzleOutputFileName}_sol.txt"))
             {
                 file.WriteLine($"{result.SolutionSteps}");
                 file.WriteLine($"{result.Directions}");
@@ -130,13 +135,32 @@ namespace Fifteen
 
         private static void SaveStats(Result result)
         {
-            using (StreamWriter file = new StreamWriter(@"Stats/4x4_01_0001_stats.txt"))
+            using (StreamWriter file = new StreamWriter($"Stats/{PuzzleOutputFileName}_stats.txt"))
             {
                 file.WriteLine($"{result.SolutionSteps}");
                 file.WriteLine($"{result.VisitedNodes}");
                 file.WriteLine($"{result.ProcessedNodes}");
                 file.WriteLine($"{result.MaxDepth}");
                 file.WriteLine($"{result.Duration}");
+            }
+        }
+
+        private static void PreparePuzzleOutputFileName()
+        {
+            PuzzleOutputFileName = PuzzleEntryFileName.Substring(7, 13);
+           PuzzleOutputFileName +=$"_{ChosenStrategy}";
+            if (ChosenHeuristic == "astr")
+            {
+                PuzzleOutputFileName += $"_{ChosenHeuristic}";
+            }
+            else
+            {
+                string word = String.Empty;
+                foreach (var s in SearchOrder)
+                {
+                    word += s;
+                }
+                PuzzleOutputFileName += $"_{word.ToLower()}";
             }
         }
 
