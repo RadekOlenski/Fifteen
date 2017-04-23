@@ -21,8 +21,11 @@ namespace Fifteen
 
         public static string PuzzleEntryFileName;
         public static string PuzzleOutputFileName;
+        public static string PuzzleOutputFileNameSol;
+        public static string PuzzleOutputFileNameStats;
 
         public static DataTable ResultTable;
+        public static bool isFileNameAuto = true;
 
 
         #endregion
@@ -39,32 +42,50 @@ namespace Fifteen
                 //Read arguments from given args
                 ProcessArgsInput(args);
             }
-
-            string[] filePaths = Directory.GetFiles(@"Puzzles/", "*.txt", SearchOption.TopDirectoryOnly);
-            InitializeDataTable();
-            for (var i = 0; i < filePaths.Length; i++)
+            //Process all puzzles in program's folder using auto names and specific settings
+            //and save data to excel file with given name
+            if (isFileNameAuto)
             {
-                var filePath = filePaths[i];
-                PuzzleEntryFileName = filePath;
-                Console.WriteLine($"Starting {PuzzleEntryFileName}...");
-                List<object> entryFileArgs = ReadEntryFile();
-                int height = Convert.ToInt32(entryFileArgs[0]);
-                int width = Convert.ToInt32(entryFileArgs[1]);
-                Puzzle entryPuzzle = new Puzzle(height, width, (List<int>)entryFileArgs[2]);
-                Result result = ProcessPuzzle(entryPuzzle);
-                PreparePuzzleOutputFileName();
-                SaveSolution(result);
-                SaveStats(result);
-                AddResultToDataTable(result);
-                Console.WriteLine($"{PuzzleEntryFileName} done!");
+                string[] filePaths = Directory.GetFiles(@"Puzzles/", "*.txt", SearchOption.TopDirectoryOnly);
+                InitializeDataTable();
+                foreach (var filePath in filePaths)
+                {
+                    HandleSpecificPuzzle(filePath);
+                }
+                CreateFile(ResultTable, $"{ChosenStrategy}_{TransformSearchOrderToOutput()}_{ChosenHeuristic}_results.xlsx", "Template.xlsx");
             }
-            CreateFile(ResultTable, $"{ChosenStrategy}_{TransformSearchOrderToOutput()}_{ChosenHeuristic}_results.xlsx", "Template.xlsx");
+            //Process only one specific puzzle with three given filenames
+            else
+            {
+                HandleSpecificPuzzle(PuzzleEntryFileName);
+            }
             Console.WriteLine($"Done!");
             Console.ReadLine();
         }
 
+        #region Methods
+        private static void HandleSpecificPuzzle(string filePath)
+        {
+            PuzzleEntryFileName = filePath;
+            Console.WriteLine($"Starting {PuzzleEntryFileName}...");
+            List<object> entryFileArgs = ReadEntryFile();
+            int height = Convert.ToInt32(entryFileArgs[0]);
+            int width = Convert.ToInt32(entryFileArgs[1]);
+            Puzzle entryPuzzle = new Puzzle(height, width, (List<int>)entryFileArgs[2]);
+            Result result = ProcessPuzzle(entryPuzzle);
+            PreparePuzzleOutputFileName();
+            SaveSolution(result);
+            SaveStats(result);
+            if (isFileNameAuto)
+            {
+                AddResultToDataTable(result);
+            }
+            Console.WriteLine($"{PuzzleEntryFileName} done!");
+        }
+
         private static void ProcessArgsInput(string[] args)
         {
+            int txtCounter = 0;
             foreach (string arg in args)
             {
                 if (arg == "-astr" || arg == "-bfs" || arg == "-dfs")
@@ -77,12 +98,32 @@ namespace Fifteen
                 }
                 else if (arg.Contains("-") && arg.Contains("R") && arg.Contains("D") && arg.Contains("U") && arg.Contains("L"))
                 {
-                    SearchOrder = new string[]{arg.Substring(1,1), arg.Substring(2, 1) , arg.Substring(3, 1) , arg.Substring(4, 1)};
+                    SearchOrder = new string[] { arg.Substring(1, 1), arg.Substring(2, 1), arg.Substring(3, 1), arg.Substring(4, 1) };
+                }
+                else if (arg.Contains(".txt") && txtCounter == 0)
+                {
+                    isFileNameAuto = false;
+                    PuzzleEntryFileName = $"Puzzles/{arg}";
+                    txtCounter++;
+                }
+                else if (arg.Contains(".txt") && txtCounter == 1)
+                {
+                    isFileNameAuto = false;
+                    PuzzleOutputFileNameSol = arg;
+                    txtCounter++;
+                }
+                else if (arg.Contains(".txt") && txtCounter == 2)
+                {
+                    isFileNameAuto = false;
+                    PuzzleOutputFileNameStats = arg;
+                    txtCounter++;
                 }
             }
+            if (txtCounter > 0 && txtCounter < 3)
+            {
+                throw new Exception("Some output filenames are missing!");
+            }
         }
-
-        #region Methods
 
         public static void ProcessConsoleInput()
         {
@@ -96,12 +137,17 @@ namespace Fifteen
                 Console.WriteLine("Choose heuristic [hamm, manh]: ");
                 ChosenHeuristic = Console.ReadLine();
             }
-            //Console.WriteLine("Choose entry puzzle state file: ");
-            //PuzzleEntryFileName = Console.ReadLine();
-        }
-
-        public static void ProcessArgsInput()
-        {
+            Console.WriteLine("Manual filenames? [Y/N] (required 3 filenames with extensions)");
+            if (Console.ReadLine().ToLower() == "y")
+            {
+                isFileNameAuto = false;
+                Console.WriteLine("Choose entry puzzle state file: ");
+                PuzzleEntryFileName = $"Puzzles/{Console.ReadLine()}";
+                Console.WriteLine("Choose output puzzle solution file: ");
+                PuzzleOutputFileNameSol = Console.ReadLine();
+                Console.WriteLine("Choose output puzzle stats file: ");
+                PuzzleOutputFileNameStats = Console.ReadLine();
+            }
         }
 
         private static List<object> ReadEntryFile()
@@ -121,7 +167,7 @@ namespace Fifteen
                         args.AddRange(sizes);
                     }
                     String puzzleValues = sr.ReadToEnd();
-                    List<string> strings = puzzleValues.Split(new[] {"\r\n", "\n", " " }, StringSplitOptions.None).ToList();
+                    List<string> strings = puzzleValues.Split(new[] { "\r\n", "\n", " " }, StringSplitOptions.None).ToList();
                     strings.Remove(strings.Last());
                     List<int> values = strings.Select(int.Parse).ToList();
                     args.Add(values);
@@ -151,7 +197,11 @@ namespace Fifteen
 
         private static void SaveSolution(Result result)
         {
-            using (StreamWriter file = new StreamWriter($"Solutions/{PuzzleOutputFileName}_sol.txt"))
+            if (isFileNameAuto)
+            {
+                PuzzleOutputFileNameSol = $"{PuzzleOutputFileName}_sol.txt";
+            }
+            using (StreamWriter file = new StreamWriter($"Solutions/{PuzzleOutputFileNameSol}"))
             {
                 file.WriteLine($"{result.SolutionSteps}");
                 file.WriteLine($"{result.Directions}");
@@ -160,7 +210,11 @@ namespace Fifteen
 
         private static void SaveStats(Result result)
         {
-            using (StreamWriter file = new StreamWriter($"Stats/{PuzzleOutputFileName}_stats.txt"))
+            if (isFileNameAuto)
+            {
+                PuzzleOutputFileNameStats = $"{PuzzleOutputFileName}_stats.txt";
+            }
+            using (StreamWriter file = new StreamWriter($"Stats/{PuzzleOutputFileNameStats}"))
             {
                 file.WriteLine($"{result.SolutionSteps}");
                 file.WriteLine($"{result.VisitedNodes}");
@@ -172,6 +226,7 @@ namespace Fifteen
 
         private static void PreparePuzzleOutputFileName()
         {
+            if (!isFileNameAuto) return;
             PuzzleOutputFileName = PuzzleEntryFileName.Substring(7, 13);
             PuzzleOutputFileName += $"_{ChosenStrategy}";
             if (ChosenHeuristic == "astr")
