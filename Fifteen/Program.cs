@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Fifteen.Base;
+using Fifteen.Puzzles;
 using Fifteen.Strategies;
 
 namespace Fifteen
@@ -19,7 +21,9 @@ namespace Fifteen
 
         public static string PuzzleEntryFileName;
         public static string PuzzleOutputFileName;
-        
+
+        public static DataTable ResultTable;
+
 
         #endregion
 
@@ -37,7 +41,7 @@ namespace Fifteen
             }
 
             string[] filePaths = Directory.GetFiles(@"Puzzles/", "*.txt", SearchOption.TopDirectoryOnly);
-
+            InitializeDataTable();
             for (var i = 0; i < filePaths.Length; i++)
             {
                 var filePath = filePaths[i];
@@ -46,13 +50,15 @@ namespace Fifteen
                 List<object> entryFileArgs = ReadEntryFile();
                 int height = Convert.ToInt32(entryFileArgs[0]);
                 int width = Convert.ToInt32(entryFileArgs[1]);
-                Puzzle entryPuzzle = new Puzzle(height, width, (List<int>) entryFileArgs[2]);
+                Puzzle entryPuzzle = new Puzzle(height, width, (List<int>)entryFileArgs[2]);
                 Result result = ProcessPuzzle(entryPuzzle);
                 PreparePuzzleOutputFileName();
                 SaveSolution(result);
                 SaveStats(result);
+                AddResultToDataTable(result);
                 Console.WriteLine($"{PuzzleEntryFileName} done!");
             }
+            CreateFile(ResultTable, "results.xlsx", "Template.xlsx");
             Console.WriteLine($"Done!");
             Console.ReadLine();
         }
@@ -96,7 +102,7 @@ namespace Fifteen
                         args.AddRange(sizes);
                     }
                     String puzzleValues = sr.ReadToEnd();
-                    List<string> strings = puzzleValues.Split(new[] {"\r\n", "\n", " "}, StringSplitOptions.None).ToList();
+                    List<string> strings = puzzleValues.Split(new[] {"\r\n", "\n", " " }, StringSplitOptions.None).ToList();
                     strings.Remove(strings.Last());
                     List<int> values = strings.Select(int.Parse).ToList();
                     args.Add(values);
@@ -148,22 +154,69 @@ namespace Fifteen
         private static void PreparePuzzleOutputFileName()
         {
             PuzzleOutputFileName = PuzzleEntryFileName.Substring(7, 13);
-           PuzzleOutputFileName +=$"_{ChosenStrategy}";
+            PuzzleOutputFileName += $"_{ChosenStrategy}";
             if (ChosenHeuristic == "astr")
             {
                 PuzzleOutputFileName += $"_{ChosenHeuristic}";
             }
             else
             {
-                string word = String.Empty;
-                foreach (var s in SearchOrder)
-                {
-                    word += s;
-                }
-                PuzzleOutputFileName += $"_{word.ToLower()}";
+                PuzzleOutputFileName += $"_{TransformSearchOrderToOutput()}";
             }
         }
 
+        public static void CreateFile(DataTable reportdata, string fileName, string excelTemplate)
+        {
+            var data = new ExcelData
+            {
+                ReportData = reportdata
+            };
+
+            new ExcelWriter(excelTemplate).Export(data, fileName);
+        }
+
+        private static void InitializeDataTable()
+        {
+            ResultTable = new DataTable();
+            ResultTable.Columns.Add("PuzzleDepth");
+            ResultTable.Columns.Add("ID");
+            ResultTable.Columns.Add("Strategy");
+            ResultTable.Columns.Add("Order");
+            ResultTable.Columns.Add("Heuristic");
+            ResultTable.Columns.Add("Steps");
+            ResultTable.Columns.Add("Directions");
+            ResultTable.Columns.Add("VisitedNodes");
+            ResultTable.Columns.Add("ProcessedNodes");
+            ResultTable.Columns.Add("MaxDepth");
+            ResultTable.Columns.Add("Duration");
+        }
+
+        private static void AddResultToDataTable(Result result)
+        {
+            DataRow row = ResultTable.NewRow();
+            row["PuzzleDepth"] = PuzzleOutputFileName.Substring(5, 2);
+            row["ID"] = PuzzleOutputFileName.Substring(8, 5);
+            row["Strategy"] = ChosenStrategy;
+            row["Order"] = TransformSearchOrderToOutput();
+            row["Heuristic"] = ChosenHeuristic;
+            row["Steps"] = result.SolutionSteps;
+            row["Directions"] = result.Directions;
+            row["VisitedNodes"] = result.VisitedNodes;
+            row["ProcessedNodes"] = result.ProcessedNodes;
+            row["MaxDepth"] = result.MaxDepth;
+            row["Duration"] = result.Duration;
+            ResultTable.Rows.Add(row);
+        }
+
+        private static string TransformSearchOrderToOutput()
+        {
+            string word = String.Empty;
+            foreach (var s in SearchOrder)
+            {
+                word += s;
+            }
+            return word.ToLower();
+        }
         #endregion
     }
 }
