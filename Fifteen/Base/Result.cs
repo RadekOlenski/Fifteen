@@ -13,6 +13,6 @@ namespace Fifteen.Base
         public int VisitedNodes;
         public int ProcessedNodes;
         public int MaxDepth;
-        public float Duration;
+        public double Duration;
     }
 }
