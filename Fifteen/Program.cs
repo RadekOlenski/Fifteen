@@ -147,7 +147,7 @@ namespace Fifteen
 
         private static void PreparePuzzleOutputFileName()
         {
-            PuzzleOutputFileName = PuzzleEntryFileName.Substring(7, 12);
+            PuzzleOutputFileName = PuzzleEntryFileName.Substring(7, 13);
            PuzzleOutputFileName +=$"_{ChosenStrategy}";
             if (ChosenHeuristic == "astr")
             {
