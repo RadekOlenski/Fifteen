@@ -9,15 +9,17 @@ namespace Fifteen.Strategies
     {
         #region Fields
 
-        private const int MaxRecursionDepth = 20;
+        private const int MaxRecursionDepth = 11;
 
         private Node entryNode;
-        private HashSet<Node> visitedNodes;
+        private List<Node> visitedNodes;
         private string[] searchOrder;
         private Stack<Node> stack;
 
         //Return values
         private int processedNodes;
+
+        private int visitedNodesNumber;
 
         private int depth;
         private Stopwatch stopwatch;
@@ -31,7 +33,7 @@ namespace Fifteen.Strategies
             this.entryNode = entryNode;
             this.searchOrder = searchOrder;
             stack = new Stack<Node>();
-            visitedNodes = new HashSet<Node>();
+            visitedNodes = new List<Node>();
         }
 
         #endregion
@@ -45,6 +47,48 @@ namespace Fifteen.Strategies
             //We enqueue our first given node
             stack.Push(entryNode);
 
+            while (stack.Count > 0)
+            {
+                entryNode = stack.Pop();
+                processedNodes++;
+
+                if (visitedNodes.Contains(entryNode))
+                    continue;
+
+                visitedNodes.Add(entryNode);
+
+                if (entryNode.Depth >= MaxRecursionDepth) continue;
+
+                for (var i = 0; i < searchOrder.Length; i++)
+                {
+                    string direction = searchOrder[i];
+                    //Check if we can move zero in desired direction 
+                    if (!entryNode.PuzzleState.CanMoveInDirection(direction)) continue;
+
+                    Node tempNode = new Node(entryNode.PuzzleState.MoveInDirection(direction), entryNode.Depth + 1,
+                        entryNode.PreviousDirections + direction);
+
+                    if (tempNode.Depth > depth)
+                    {
+                        depth = tempNode.Depth;
+                    }
+
+                    //if (visitedNodes.Contains(tempNode)) continue;
+                   
+                    //Check if this is a node we are looking for
+                    if (tempNode.PuzzleState.CheckIfInDesiredState())
+                    {
+                        stopwatch.Stop();
+                        return ProcessResult(tempNode);
+                    }
+
+                    if(stack.Contains(tempNode)) continue;
+
+                    stack.Push(tempNode);
+                    visitedNodesNumber++;
+                }
+            }
+
             stopwatch.Stop();
             return ProcessFailedResult();
         }
@@ -56,7 +100,7 @@ namespace Fifteen.Strategies
                 SolutionSteps = endNode.Depth,
                 Directions = endNode.PreviousDirections,
                 ProcessedNodes = processedNodes,
-                VisitedNodes = visitedNodes.Count,
+                VisitedNodes = visitedNodesNumber,
                 MaxDepth = depth,
                 Duration = stopwatch.ElapsedMilliseconds
             };
@@ -70,7 +114,7 @@ namespace Fifteen.Strategies
             {
                 SolutionSteps = -1,
                 ProcessedNodes = processedNodes,
-                VisitedNodes = visitedNodes.Count,
+                VisitedNodes = visitedNodesNumber,
                 MaxDepth = depth,
                 Duration = stopwatch.ElapsedMilliseconds
             };

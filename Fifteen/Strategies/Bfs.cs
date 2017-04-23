@@ -16,6 +16,7 @@ namespace Fifteen.Strategies
 
         //Return values
         private int processedNodes;
+        private int visitedNodesNumber;
 
         private int depth;
         private Stopwatch stopwatch;
@@ -61,7 +62,7 @@ namespace Fifteen.Strategies
                 for (var i = 0; i < searchOrder.Length; i++)
                 {
                     string direction = searchOrder[i];
-//Check if we can move zero in desired direction 
+                    //Check if we can move zero in desired direction 
                     if (!entryNode.PuzzleState.CanMoveInDirection(direction)) continue;
 
                     //If we can move we create new node
@@ -82,6 +83,7 @@ namespace Fifteen.Strategies
                         stopwatch.Stop();
                         return ProcessResult(tempNode);
                     }
+                    visitedNodesNumber++;
 
                     //If new node is not in queue and is not visited we add it to new queue
                     if (!nodesQueue.Contains(tempNode))
@@ -109,7 +111,7 @@ namespace Fifteen.Strategies
                 SolutionSteps = endNode.Depth,
                 Directions = endNode.PreviousDirections,
                 ProcessedNodes = processedNodes,
-                VisitedNodes = visitedNodes.Count,
+                VisitedNodes = visitedNodesNumber,
                 MaxDepth = depth,
                 Duration = stopwatch.ElapsedMilliseconds
             };
@@ -123,7 +125,7 @@ namespace Fifteen.Strategies
             {
                 SolutionSteps = -1,
                 ProcessedNodes = processedNodes,
-                VisitedNodes = visitedNodes.Count,
+                VisitedNodes = visitedNodesNumber,
                 MaxDepth = depth,
                 Duration = stopwatch.ElapsedMilliseconds
             };
