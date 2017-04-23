@@ -34,7 +34,7 @@ namespace Fifteen
 
         public Result ProcessPuzzle()
         {
-           return chosenHeuristic.Equals("hamm") ? ProcessHamming() : ProcessManhattan();
+            return chosenHeuristic.Equals("hamm") ? ProcessHamming() : ProcessManhattan();
         }
 
         public Result ProcessManhattan()
@@ -99,6 +99,7 @@ namespace Fifteen
             stopwatch.Stop();
             return ProcessFailedResult();
         }
+
         public Result ProcessHamming()
         {
             stopwatch = Stopwatch.StartNew();
@@ -171,7 +172,7 @@ namespace Fifteen
                 ProcessedNodes = processedNodes,
                 VisitedNodes = visitedNodes.Count,
                 MaxDepth = depth,
-                Duration = stopwatch.ElapsedMilliseconds
+                Duration = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 3)
             };
 
             return result;
@@ -185,7 +186,7 @@ namespace Fifteen
                 ProcessedNodes = processedNodes,
                 VisitedNodes = visitedNodes.Count,
                 MaxDepth = depth,
-                Duration = stopwatch.ElapsedMilliseconds
+                Duration = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 3)
             };
 
             return result;
@@ -235,6 +236,5 @@ namespace Fifteen
             }
             return cost;
         }
-
     }
 }

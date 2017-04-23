@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Fifteen.Base;
@@ -9,7 +10,7 @@ namespace Fifteen.Strategies
     {
         #region Fields
 
-        private const int MaxRecursionDepth = 15;
+        private const int MaxRecursionDepth = 11;
 
         private Node entryNode;
         private List<Node> visitedNodes;
@@ -47,76 +48,80 @@ namespace Fifteen.Strategies
             //-----------------------------------------RECURSIVE METHOD-------------------------
 
 
-            visitedNodes.Add(entryNode);
+            //visitedNodes.Add(entryNode);
 
-            Node returnedNode = RunDfs(entryNode);
+            //Node returnedNode = RunDfs(entryNode);
 
-            if (returnedNode != null)
-            {
-                return ProcessResult(returnedNode);
-            }
-            else
-            {
-                return ProcessFailedResult();
-            }
+            //if (returnedNode != null)
+            //{
+            //    return ProcessResult(returnedNode);
+            //}
+            //else
+            //{
+            //    return ProcessFailedResult();
+            //}
 
             //-----------------------------------------STACK METHOD-------------------------
 
-            ////We enqueue our first given node
-            //stack.Push(entryNode);
+            //We enqueue our first given node
+            stack.Push(entryNode);
+
+            visitedNodesNumber++;
 
 
-            //while (stack.Count > 0)
-            //{
-            //    entryNode = stack.Pop();
-            //    processedNodes++;
+            while (stack.Count > 0)
+            {
+                entryNode = stack.Pop();
 
-            //    if (visitedNodes.Contains(entryNode))
-            //        continue;
+                //if (visitedNodes.Contains(entryNode))
+                //    continue;
 
-            //    visitedNodes.Add(entryNode);
 
-            //    if (entryNode.Depth >= MaxRecursionDepth) continue;
+                if (entryNode.Depth >= MaxRecursionDepth) continue;
 
-            //    for (var i = 0; i < searchOrder.Length; i++)
-            //    {
-            //        string direction = searchOrder[i];
-            //        //Check if we can move zero in desired direction 
-            //        if (!entryNode.PuzzleState.CanMoveInDirection(direction)) continue;
+                for (var i = 0; i < searchOrder.Length; i++)
+                {
+                    string direction = searchOrder[i];
+                    //Check if we can move zero in desired direction 
+                    if (!entryNode.PuzzleState.CanMoveInDirection(direction)) continue;
 
-            //        Node tempNode = new Node(entryNode.PuzzleState.MoveInDirection(direction), entryNode.Depth + 1,
-            //            entryNode.PreviousDirections + direction);
+                    Node tempNode = new Node(entryNode.PuzzleState.MoveInDirection(direction), entryNode.Depth + 1,
+                        entryNode.PreviousDirections + direction);
 
-            //        if (tempNode.Depth > depth)
-            //        {
-            //            depth = tempNode.Depth;
-            //        }
+                    if (tempNode.Depth > depth)
+                    {
+                        depth = tempNode.Depth;
+                    }
 
-            //        //if (visitedNodes.Contains(tempNode)) continue;
+                    //if (visitedNodes.Contains(tempNode)) continue;
 
-            //        //Check if this is a node we are looking for
-            //        if (tempNode.PuzzleState.CheckIfInDesiredState())
-            //        {
-            //            stopwatch.Stop();
-            //            return ProcessResult(tempNode);
-            //        }
+                    //Check if this is a node we are looking for
+                    if (tempNode.PuzzleState.CheckIfInDesiredState())
+                    {
+                        stopwatch.Stop();
+                        processedNodes++;
+                        return ProcessResult(tempNode);
+                    }
 
-            //        if (stack.Contains(tempNode)) continue;
+                    if (stack.Contains(tempNode)) continue;
 
-            //        stack.Push(tempNode);
-            //        visitedNodesNumber++;
-            //    }
-            //    visitedNodesNumber++;
+                    stack.Push(tempNode);
+                    visitedNodes.Add(entryNode);
+                    visitedNodesNumber++;
+                }
+                processedNodes++;
 
-            //}
+            }
 
-            //stopwatch.Stop();
-            //return ProcessFailedResult();
+            stopwatch.Stop();
+            return ProcessFailedResult();
         }
 
         private Node RunDfs(Node node)
         {
-            //if (visitedNodes.Contains(entryNode)) return null;
+            if (visitedNodes.Contains(node)) return null;
+
+            visitedNodes.Add(node);
 
             //Check max recursion depth
             if (node.Depth >= MaxRecursionDepth) return null;
@@ -146,8 +151,8 @@ namespace Fifteen.Strategies
                         return childNode;
                     }
 
-                    //Add node to visited
-                    visitedNodes.Add(childNode);
+                    ////Add node to visited
+                    //visitedNodes.Add(childNode);
 
                     //Run recurrency on node
                     Node returnedNode = RunDfs(childNode);
@@ -174,9 +179,9 @@ namespace Fifteen.Strategies
                 SolutionSteps = endNode.Depth,
                 Directions = endNode.PreviousDirections,
                 ProcessedNodes = processedNodes,
-                VisitedNodes = visitedNodes.Count,
+                VisitedNodes = visitedNodesNumber,
                 MaxDepth = depth,
-                Duration = stopwatch.ElapsedMilliseconds
+                Duration = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 3)
             };
 
             return result;
@@ -188,9 +193,9 @@ namespace Fifteen.Strategies
             {
                 SolutionSteps = -1,
                 ProcessedNodes = processedNodes,
-                VisitedNodes = visitedNodes.Count,
+                VisitedNodes = visitedNodesNumber,
                 MaxDepth = depth,
-                Duration = stopwatch.ElapsedMilliseconds
+                Duration = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 3)
             };
 
             return result;

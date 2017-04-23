@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Fifteen.Base;
@@ -50,6 +51,8 @@ namespace Fifteen.Strategies
                 stopwatch.Stop();
                 return ProcessResult(entryNode);
             }
+
+            visitedNodesNumber++;
 
             //We process nodes till no left in queue
             while (nodesQueue.Count != 0)
@@ -113,7 +116,7 @@ namespace Fifteen.Strategies
                 ProcessedNodes = processedNodes,
                 VisitedNodes = visitedNodesNumber,
                 MaxDepth = depth,
-                Duration = stopwatch.ElapsedMilliseconds
+                Duration = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 3)
             };
 
             return result;
@@ -127,7 +130,7 @@ namespace Fifteen.Strategies
                 ProcessedNodes = processedNodes,
                 VisitedNodes = visitedNodesNumber,
                 MaxDepth = depth,
-                Duration = stopwatch.ElapsedMilliseconds
+                Duration = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 3)
             };
 
             return result;
