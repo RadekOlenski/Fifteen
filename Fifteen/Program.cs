@@ -15,7 +15,7 @@ namespace Fifteen
     {
         #region Fields
 
-        public static string ChosenStrategy;
+        public static string ChosenStrategy = "none";
         public static string[] SearchOrder;
         public static string ChosenHeuristic;
 
@@ -58,7 +58,7 @@ namespace Fifteen
                 AddResultToDataTable(result);
                 Console.WriteLine($"{PuzzleEntryFileName} done!");
             }
-            CreateFile(ResultTable, "results.xlsx", "Template.xlsx");
+            CreateFile(ResultTable, $"{ChosenStrategy}_{TransformSearchOrderToOutput()}_{ChosenHeuristic}_results.xlsx", "Template.xlsx");
             Console.WriteLine($"Done!");
             Console.ReadLine();
         }
