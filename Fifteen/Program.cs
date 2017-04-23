@@ -37,7 +37,7 @@ namespace Fifteen
             else
             {
                 //Read arguments from given args
-                ProcessArgsInput();
+                ProcessArgsInput(args);
             }
 
             string[] filePaths = Directory.GetFiles(@"Puzzles/", "*.txt", SearchOption.TopDirectoryOnly);
@@ -61,6 +61,25 @@ namespace Fifteen
             CreateFile(ResultTable, $"{ChosenStrategy}_{TransformSearchOrderToOutput()}_{ChosenHeuristic}_results.xlsx", "Template.xlsx");
             Console.WriteLine($"Done!");
             Console.ReadLine();
+        }
+
+        private static void ProcessArgsInput(string[] args)
+        {
+            foreach (string arg in args)
+            {
+                if (arg == "-astr" || arg == "-bfs" || arg == "-dfs")
+                {
+                    ChosenStrategy = arg;
+                }
+                else if (arg == "-hamm" || arg == "-manh")
+                {
+                    ChosenHeuristic = arg;
+                }
+                else if (arg.Contains("-") && arg.Contains("R") && arg.Contains("D") && arg.Contains("U") && arg.Contains("L"))
+                {
+                    SearchOrder = new string[]{arg.Substring(1,1), arg.Substring(2, 1) , arg.Substring(3, 1) , arg.Substring(4, 1)};
+                }
+            }
         }
 
         #region Methods
